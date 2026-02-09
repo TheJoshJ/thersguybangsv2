@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import { Home } from "./pages/Home/Home";
+import Home from "./pages/Home";
+import { Stats } from "./pages/Stats";
 
 export const AppRoutes = () => (
   <Routes>
@@ -13,7 +14,14 @@ export const AppRoutes = () => (
       }
     />
 
-    {/* Add more routes here */}
+    <Route
+      path="/stats"
+      element={
+        <Layout>
+          <Stats />
+        </Layout>
+      }
+    />
 
     {/* 404 fallback */}
     <Route

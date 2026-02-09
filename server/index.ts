@@ -1,3 +1,4 @@
+import "dotenv/config";
 import app from "./app.js";
 
 // Export the app for @hono/vite-dev-server
