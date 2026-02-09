@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { db, schema } from "../db/index.js";
-import { eq, desc } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 
-const vods = new Hono();
+const transcripts = new Hono();
 
-// GET /api/v1/vods - Returns all VODs with bang data
-vods.get("/", async (c) => {
+// GET /api/v1/transcripts - Returns all videos and VODs with bang data
+transcripts.get("/", async (c) => {
   try {
     const result = await db
       .select({
@@ -15,16 +15,16 @@ vods.get("/", async (c) => {
         fileName: schema.videos.fileName,
         bang_count: schema.videos.bangCount,
         bangs: schema.videos.bangs,
+        source: schema.videos.source,
       })
       .from(schema.videos)
-      .where(eq(schema.videos.source, "vod"))
       .orderBy(desc(schema.videos.publishedAt));
 
     return c.json(result);
   } catch (error) {
-    console.error("Error fetching VODs:", error);
-    return c.json({ error: "Failed to fetch VODs" }, 500);
+    console.error("Error fetching transcripts:", error);
+    return c.json({ error: "Failed to fetch transcripts" }, 500);
   }
 });
 
-export default vods;
+export default transcripts;

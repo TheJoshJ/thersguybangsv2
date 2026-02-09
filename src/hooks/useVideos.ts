@@ -12,47 +12,40 @@ export interface VideoRecord {
   fileName: string | null;
   bang_count: number;
   bangs: TimestampEntry[];
-  source?: "video" | "vod";
+  source: "video" | "vod";
 }
 
-const fetchVideos = async (): Promise<VideoRecord[]> => {
-  const response = await fetch("/api/v1/videos");
+const fetchTranscripts = async (): Promise<VideoRecord[]> => {
+  const response = await fetch("/api/v1/transcripts");
   if (!response.ok) {
-    throw new Error("Failed to fetch videos");
+    throw new Error("Failed to fetch transcripts");
   }
-  const data = await response.json();
-  return data.map((item: VideoRecord) => ({ ...item, source: "video" as const }));
-};
-
-const fetchVods = async (): Promise<VideoRecord[]> => {
-  const response = await fetch("/api/v1/vods");
-  if (!response.ok) {
-    throw new Error("Failed to fetch VODs");
-  }
-  const data = await response.json();
-  return data.map((item: VideoRecord) => ({ ...item, source: "vod" as const }));
+  return response.json();
 };
 
 export function useAllVideos() {
   return useQuery({
-    queryKey: ["allVideos"],
-    queryFn: async () => {
-      const [videos, vods] = await Promise.all([fetchVideos(), fetchVods()]);
-      return [...videos, ...vods];
-    },
+    queryKey: ["transcripts"],
+    queryFn: fetchTranscripts,
   });
 }
 
 export function useVideos() {
   return useQuery({
-    queryKey: ["videos"],
-    queryFn: fetchVideos,
+    queryKey: ["transcripts", "videos"],
+    queryFn: async () => {
+      const all = await fetchTranscripts();
+      return all.filter((item) => item.source === "video");
+    },
   });
 }
 
 export function useVods() {
   return useQuery({
-    queryKey: ["vods"],
-    queryFn: fetchVods,
+    queryKey: ["transcripts", "vods"],
+    queryFn: async () => {
+      const all = await fetchTranscripts();
+      return all.filter((item) => item.source === "vod");
+    },
   });
 }
